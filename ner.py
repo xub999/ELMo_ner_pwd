@@ -5,7 +5,7 @@ import glob
 USE_google_drive = True
 USE_checkpoint_model = True
 
-MODE = "TEST"
+MODE = "TRAIN"
 
 import os
 import numpy as np
@@ -15,9 +15,9 @@ config = dict()
 
 elmo = dict()
 
-dir = "/content/ELMo_ner/"
+dir = "/content/ELMo_ner_pwd/"
 if USE_google_drive:
-    dir = "/content/drive/My Drive/ai-gg_drive/ner/ELMo_ner/"
+    dir = "/content/drive/My Drive/ai-gg_drive/ner/ELMo_ner_pwd/"
 
 elmo['data_path'] = dir + "data/ner_dataset.csv"
 elmo['modelCheckpoint_file'] = dir + "record/modelCheckpoint_file.cpt"
@@ -34,7 +34,16 @@ elmo['test_rate'] = 0.1
 elmo['val_rate'] = 0.1
 elmo["n_epochs"] = 20
 
-elmo['tags'] = ['O', 'I-eve', 'I-tim', 'I-org', 'I-gpe', 'B-tim', 'B-eve', 'I-per', 'B-gpe', 'B-per', 'B-geo', 'I-geo', 'I-nat', 'B-org', 'I-art', 'B-nat', 'B-art']
+elmo['tags'] = ['O',
+                'B-art', 'I-art',
+                'B-eve', 'I-eve',
+                'B-geo', 'I-geo',
+                'B-gpe', 'I-gpe',
+                'B-nat', 'I-nat',
+                'B-org', 'I-org',
+                'B-per', 'I-per',
+                'B-tim', 'I-tim',
+                'B-pwd', 'I-pwd']
 elmo['n_tags'] = len(elmo['tags'])
 
 elmo['pad_wording'] = '__PAD__'
