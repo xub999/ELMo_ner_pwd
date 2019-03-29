@@ -5,11 +5,15 @@ import glob
 USE_google_drive = True
 USE_checkpoint_model = True
 
-MODE = "TRAIN"
+MODE = "TEST"
+TRAIN_PWD = True
 
 import os
 import numpy as np
-
+import math
+import nltk
+from nltk.tokenize import word_tokenize
+nltk.download('punkt')
 
 config = dict()
 
@@ -20,6 +24,11 @@ if USE_google_drive:
     dir = "/content/drive/My Drive/ai-gg_drive/ner/ELMo_ner_pwd/"
 
 elmo['data_path'] = dir + "data/ner_dataset.csv"
+elmo['common_pwds_file'] = dir + "data/common_pwds.txt"
+elmo['pwd_sent_tpl_file'] = dir + "data/pwd_sentence_tpl.txt"
+elmo['pwd_total_nb_batch_train'] = 100
+elmo['pwd_include_rate'] = 0.05
+
 elmo['modelCheckpoint_file'] = dir + "record/modelCheckpoint_file.cpt"
 elmo['have_trained_nb_epoch_file'] = dir + "record/have_trained_nb_epoch.dat.npy"
 elmo['tensorboard_dir'] = dir + "record/tensorboard"
@@ -27,12 +36,12 @@ elmo['hub_model_file'] = dir + "record/hub_elmo_module"
 elmo['model_h5'] = dir + "record/keras_model/"
 elmo['val_metrics_file'] = dir + "record/val_metrics.dat"
 
-elmo['batch_size'] = 96
+elmo['batch_size'] = 300
 elmo['maxlen'] = 50
 
 elmo['test_rate'] = 0.1
 elmo['val_rate'] = 0.1
-elmo["n_epochs"] = 20
+elmo["n_epochs"] = 40
 
 elmo['tags'] = ['O',
                 'B-art', 'I-art',
@@ -74,7 +83,6 @@ import random
 
 def my_train_test_split(X, y, split_rate):
     split_index = int(X.shape[0] * (1.0-split_rate))
-    print("split_index = " + str(split_index))
     return X[:split_index], X[split_index:], y[:split_index], y[split_index:]
 
 class SentenceGetter(object):
@@ -187,6 +195,52 @@ class Data(object):
 
         return np.array(data_X_batch_validate), np.array(data_y_batch_validate)
 
+class Data_pwd():
+    def __init__(self):
+        self.total_nb_batch_train = elmo['pwd_total_nb_batch_train']
+
+        pwd_file = open(elmo['common_pwds_file'])
+        self.pwds_array = pwd_file.read().split("\n")
+        self.pwds_array[0] = "admin"
+
+        pwds_sent_file = open(elmo['pwd_sent_tpl_file'])
+        raw_strs_with_pwd = pwds_sent_file.read().split('\n')
+        self.raw_strs_tokens = [word_tokenize(raw_str) for raw_str in raw_strs_with_pwd]
+
+        self.xxx_indexes = [str_tokens.index("xxx") for str_tokens in self.raw_strs_tokens]
+        tokens_lens = [len(str_tokens) for str_tokens in self.raw_strs_tokens]
+
+        max_len = elmo['maxlen']
+        O_tags_array = ["O"] * max_len
+        B_pwd_tag = "B-pwd"
+
+        self.raw_tags_tokens = []
+        for tokens, xxx_index, tokens_len in zip(self.raw_strs_tokens, self.xxx_indexes, tokens_lens):
+            tags_tokens = O_tags_array[:]
+            tags_tokens[xxx_index] = B_pwd_tag
+            self.raw_tags_tokens.append(tags_tokens)
+
+        tags = elmo['tags']
+        self.tag2idx = {t: i for i, t in enumerate(tags)}
+
+    def random_gen_batch_data(self, batch_size=elmo['batch_size']):
+        raw_strs_len = len(self.raw_strs_tokens)
+        pwds_array_len = len(self.pwds_array)
+
+        random_indexes_strs_batch = np.random.randint(raw_strs_len, size=batch_size)
+        random_indexes_pwds_batch = np.random.randint(pwds_array_len, size=batch_size)
+
+        batch_strs = np.array(self.raw_strs_tokens)[random_indexes_strs_batch]
+        batch_tags = np.array(self.raw_tags_tokens)[random_indexes_strs_batch]
+
+        xxx_indexes_batch = np.array(self.xxx_indexes)[random_indexes_strs_batch]
+
+        for i in range(batch_size):
+            batch_strs[i][xxx_indexes_batch[i]] = self.pwds_array[random_indexes_pwds_batch[i]]
+
+        batch_tags2idxs = np.array([[[self.tag2idx[one_tag]] for one_tag in tags_one_sent] for tags_one_sent in batch_tags])
+
+        return process_input(list(batch_strs))[:batch_size], batch_tags2idxs
 
 """# model.py"""
 from keras.callbacks import Callback, ModelCheckpoint, TensorBoard
@@ -331,6 +385,8 @@ class ELMo(object):
         self.epoches = elmo["n_epochs"]
         self.batch_size = elmo['batch_size']
 
+        self.myData_pwd = Data_pwd()
+
         # load elmo model
         self.elmo_net = None
         # self.elmo_net = self.get_elmo()
@@ -385,6 +441,25 @@ class ELMo(object):
             yield ({'input': X_batch_validate},
                    {'output': y_batch_validate})
 
+    def generator_data_pwd_train(self):
+        while True:
+            X_batch_train, y_batch_train = self.myData_pwd.random_gen_batch_data()
+
+            yield ({'input': X_batch_train},
+                   {'output': y_batch_train})
+
+    def generator_data_train_include_pwd(self):
+        while True:
+            num_pwd_batch = int(elmo['pwd_include_rate'] * self.batch_size)
+            X_batch_train_pwd, y_batch_train_pwd = self.myData_pwd.random_gen_batch_data(num_pwd_batch)
+            X_batch_train, y_batch_train = self.next_batch_data_train()
+
+            X_batch_train[-num_pwd_batch:] = X_batch_train_pwd
+            y_batch_train[-num_pwd_batch:] = y_batch_train_pwd
+
+            yield ({'input': X_batch_train},
+                   {'output': y_batch_train})
+
     def get_elmo(self):
         input_text = Input(shape=(elmo['maxlen'],), dtype='string', name='input')
         embedding = Lambda(ElmoEmbedding, output_shape=(elmo['maxlen'], 1024))(input_text)
@@ -419,6 +494,45 @@ class ELMo(object):
 
         elmo_net.fit_generator(
             generator=self.generator_data_train_fine(),
+            steps_per_epoch=self.myData.total_nb_batch_train,
+            epochs=self.epoches,
+            verbose=1,
+            # callbacks=[save_crt_epoch_nb, checkpointer, tensorboard],
+            callbacks=[my_metrics, save_crt_epoch_nb, checkpointer, tensorboard],
+            # validation_data=self.generator_data_validate_fine(),
+            # validation_steps=self.myData.total_nb_batch_validate,
+            class_weight=None,
+            max_queue_size=10,
+            workers=1,
+            use_multiprocessing=False,
+            shuffle=False,
+            initial_epoch=self.have_trained_nb_epoch
+            )
+
+    def train_elmo_generator_include_pwd(self):
+        elmo_net = self.elmo_net
+
+        save_crt_epoch_nb = Save_crt_epoch_nb(config['elmo']['have_trained_nb_epoch_file'])
+        save_keras_model = Save_keras_model(config['elmo']['model_h5'])
+        checkpointer = ModelCheckpoint(filepath=config['elmo']['modelCheckpoint_file'],
+                                       verbose=1, save_best_only=False, save_weights_only=False)
+        tensorboard = TensorBoard(log_dir=config['elmo']['tensorboard_dir'])
+
+        self.myData.X_val = np.array(self.myData.X_val)
+        self.myData.y_val = np.array(self.myData.y_val)
+        num_pwd_batch = int(self.myData.X_val.shape[0] * elmo['pwd_include_rate'])
+        X_batch_val_pwd, y_batch_val_pwd = self.myData_pwd.random_gen_batch_data(num_pwd_batch)
+        self.myData.X_val[-num_pwd_batch:] = X_batch_val_pwd
+        self.myData.y_val[-num_pwd_batch:] = y_batch_val_pwd
+        val_data = [self.myData.X_val, self.myData.y_val]
+        my_metrics = My_Metrics(val_data)
+
+        saveRecords = Save_records()
+
+        print('Fitting model...')
+
+        elmo_net.fit_generator(
+            generator=self.generator_data_train_include_pwd(),
             steps_per_epoch=self.myData.total_nb_batch_train,
             epochs=self.epoches,
             verbose=1,
@@ -510,11 +624,6 @@ class ELMo_test():
                            -1)  # (None, 50)
         return y_pred
 
-import math
-import nltk
-from nltk.tokenize import word_tokenize
-nltk.download('punkt')
-
 
 def predict_one_sample(elmo_model_test, raw_x_str):
     x_tokens = [word_tokenize(raw_x_str)]
@@ -587,12 +696,17 @@ if __name__ == '__main__':
 
     if MODE == "TRAIN":
         my_elmo_model = ELMo()
-        my_elmo_model.train_elmo_generator()
+        if TRAIN_PWD:
+            my_elmo_model.train_elmo_generator_include_pwd()
+        else:
+            my_elmo_model.train_elmo_generator()
     else:
         my_elmo_mode_test = ELMo_test()
-        raw_str = "I am Barton Xu, he is Aspire Tan, and we live in Nanjing Jiangsu."
-        x_tokens, y_pred = predict_one_sample(my_elmo_mode_test, raw_str)
+        raw_str_1 = "I am Barton Xu, he is Aspire Tan, and we live in Nanjing Jiangsu."
+        raw_str_2 = "You cannot open the file if you don't type Barton."
+
+        x_tokens, y_pred = predict_one_sample(my_elmo_mode_test, raw_str_2)
         print_one_sample_and_result(x_tokens[0], y_pred[0])
 
-        x_tokens, y_pred = predict_samples(my_elmo_mode_test, [raw_str])
+        x_tokens, y_pred = predict_samples(my_elmo_mode_test, [raw_str_1, raw_str_2])
         print_one_sample_and_result(x_tokens[0], y_pred[0])

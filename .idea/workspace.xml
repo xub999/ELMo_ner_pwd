@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3e1f730a-78d1-433d-bf38-2364dfa1d630" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data.zip" beforeDir="false" afterPath="$PROJECT_DIR$/data.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ner.py" beforeDir="false" afterPath="$PROJECT_DIR$/ner.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,13 +18,65 @@
       <file leaf-file-name="ner.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+            <state relative-caret-position="275">
+              <caret line="339" lean-forward="true" selection-start-line="339" selection-end-line="339" />
+              <folding>
+                <element signature="e#1784#1957#0" />
+                <element signature="e#1993#2666#0" />
+                <element signature="e#2027#2473#0" />
+                <element signature="e#2721#5221#0" />
+                <element signature="e#5265#5512#0" />
+                <element signature="e#5554#6091#0" />
+                <element signature="e#6136#6685#0" />
+                <element signature="e#7076#8057#0" />
+                <element signature="e#8251#9076#0" />
+                <element signature="e#6865#6993#0" />
+                <element signature="e#7135#10202#0" />
+                <element signature="e#7173#8033#0" />
+                <element signature="e#8089#10202#0" />
+                <element signature="e#10244#10451#0" />
+                <element signature="e#10492#10725#0" />
+                <element signature="e#10762#11302#0" />
+                <element signature="e#12061#13745#0" />
+                <element signature="e#13792#13917#0" />
+                <element signature="e#13967#14107#0" />
+                <element signature="e#14158#14333#0" />
+                <element signature="e#14387#14577#0" />
+                <element signature="e#16951#17126#0" />
+                <element signature="e#17299#17764#0" />
+                <element signature="e#18759#20486#0" />
+                <element signature="e#20176#21915#0" />
+                <element signature="e#16963#17602#0" />
+                <element signature="e#17691#18284#0" />
+                <element signature="e#18331#18550#0" />
+                <element signature="e#18594#18870#0" />
+                <element signature="e#18906#18976#0" />
+                <element signature="e#19012#19177#0" />
+                <element signature="e#19203#20020#0" />
+                <element signature="e#19231#19819#0" />
+                <element signature="e#19855#20020#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="core.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/ner/Lib/site-packages/keras/layers/core.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="461">
+              <caret line="797" column="13" selection-start-line="797" selection-start-column="13" selection-end-line="798" selection-end-column="50" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>lstm</find>
+      <find>word_tokenize</find>
+      <find>My_Metrics</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -92,7 +146,7 @@
     <frame x="-8" y="-8" width="1858" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12857144" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12857144" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -111,14 +165,88 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
     </layout>
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="2" />
+    </breakpoint-manager>
+  </component>
   <component name="editorHistoryManager">
+    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/ner/Lib/site-packages/keras/layers/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="461">
+          <caret line="797" column="13" selection-start-line="797" selection-start-column="13" selection-end-line="798" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+        <state relative-caret-position="275">
+          <caret line="339" lean-forward="true" selection-start-line="339" selection-end-line="339" />
+          <folding>
+            <element signature="e#1784#1957#0" />
+            <element signature="e#1993#2666#0" />
+            <element signature="e#2027#2473#0" />
+            <element signature="e#2721#5221#0" />
+            <element signature="e#5265#5512#0" />
+            <element signature="e#5554#6091#0" />
+            <element signature="e#6136#6685#0" />
+            <element signature="e#7076#8057#0" />
+            <element signature="e#8251#9076#0" />
+            <element signature="e#6865#6993#0" />
+            <element signature="e#7135#10202#0" />
+            <element signature="e#7173#8033#0" />
+            <element signature="e#8089#10202#0" />
+            <element signature="e#10244#10451#0" />
+            <element signature="e#10492#10725#0" />
+            <element signature="e#10762#11302#0" />
+            <element signature="e#12061#13745#0" />
+            <element signature="e#13792#13917#0" />
+            <element signature="e#13967#14107#0" />
+            <element signature="e#14158#14333#0" />
+            <element signature="e#14387#14577#0" />
+            <element signature="e#16951#17126#0" />
+            <element signature="e#17299#17764#0" />
+            <element signature="e#18759#20486#0" />
+            <element signature="e#20176#21915#0" />
+            <element signature="e#16963#17602#0" />
+            <element signature="e#17691#18284#0" />
+            <element signature="e#18331#18550#0" />
+            <element signature="e#18594#18870#0" />
+            <element signature="e#18906#18976#0" />
+            <element signature="e#19012#19177#0" />
+            <element signature="e#19203#20020#0" />
+            <element signature="e#19231#19819#0" />
+            <element signature="e#19855#20020#0" />
+          </folding>
         </state>
       </provider>
     </entry>
